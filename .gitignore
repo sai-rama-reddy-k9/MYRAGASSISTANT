@@ -5,15 +5,10 @@ __pycache__/
 .venv/
 venv/
 env/
-pip-log.txt
-*.egg-info/
-dist/
-build/
 
 # Local project data & databases
 /data/vector_db/
 vector_db/
-outputs/
 *.db
 *.sqlite3
 *.db

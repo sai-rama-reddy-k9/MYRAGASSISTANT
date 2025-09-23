@@ -57,7 +57,6 @@ def retrieve_relevant_documents(
 
     return relevant_results["documents"]
 
-
 def respond_to_query(
     prompt_spec: dict,
     query: str,
@@ -103,8 +102,7 @@ def respond_to_query(
     response = llm_client.invoke(final_prompt)
     return response.content
 
-
-if __name__ == "__main__":
+def run_rag_pipeline():
     setup_logging()
     app_config = load_yaml_config(APP_CONFIG_FPATH)
     prompt_config = load_yaml_config(PROMPT_CONFIG_FPATH)
@@ -139,3 +137,6 @@ if __name__ == "__main__":
         logging.info("-" * 100)
         logging.info("LLM response:")
         logging.info(response + "\n\n")
+
+if __name__ == "__main__":
+    run_rag_pipeline()

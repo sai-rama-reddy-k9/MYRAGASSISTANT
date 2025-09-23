@@ -28,6 +28,7 @@ pip install -r requirements.txt
 3. **Run the application**
 
 ```bash
+python -m src.ingest   ( one time )
 python -m src.main
 ```
 

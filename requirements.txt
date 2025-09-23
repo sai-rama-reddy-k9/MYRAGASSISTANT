@@ -6,3 +6,5 @@ tiktoken
 pypdf
 python-dotenv
 sentence-transformers
+langchain_huggingface 
+langchain_groq 

@@ -12,30 +12,28 @@ def format_prompt_section(lead_in: str, value: Union[str, List[str]]) -> str:
         formatted_value = str(value).strip()
     return f"{lead_in}\n{formatted_value}"
 
-
 def build_prompt_from_config(
     config: Dict[str, Any],
-    input_data: str = "",
+    input_data: Union[str, Dict[str, Any]] = "",
     app_config: Optional[Dict[str, Any]] = None,
 ) -> str:
     """Builds a complete prompt string based on a config dictionary."""
     prompt_parts = []
 
-    # Role (use as-is; don't force lowercase — keeps formatting/grammar predictable)
+    # Role
     if role := config.get("role"):
         prompt_parts.append(f"You are {role.strip()}")
 
-    # Instruction is required for the task prompt
+    # Instruction
     instruction = config.get("instruction")
     if not instruction:
         raise ValueError("Missing required field: 'instruction'")
     prompt_parts.append(format_prompt_section("Your task is as follows:", instruction))
 
-    # Optional context field
+    # Extra fields (context, constraints, tone, etc.)
     if context := config.get("context"):
         prompt_parts.append(f"Here’s some background that may help you:\n{context}")
 
-    # Output constraints, tone, format, examples, goal (if present)
     if constraints := config.get("output_constraints"):
         prompt_parts.append(format_prompt_section("Ensure your response follows these rules:", constraints))
 
@@ -56,15 +54,29 @@ def build_prompt_from_config(
     if goal := config.get("goal"):
         prompt_parts.append(f"Your goal is to achieve the following outcome:\n{goal}")
 
-    # Include the input content (document context)
-    if input_data:
+    # 🔹 Handle input_data if it's a dict with query + docs
+    if isinstance(input_data, dict):
+        query = input_data.get("query", "")
+        docs = input_data.get("documents", [])
+        context = "\n\n".join(docs)
+
+        prompt_parts.append(f"User Question:\n{query}")
+        prompt_parts.append(
+            "Relevant Documents:\n"
+            "<<<BEGIN DOCUMENTS>>>\n"
+            f"{context}\n"
+            "<<<END DOCUMENTS>>>"
+        )
+    elif isinstance(input_data, str) and input_data.strip():
+        # Fallback: treat as raw string
         prompt_parts.append(
             "Here is the content you need to work with:\n"
             "<<<BEGIN CONTENT>>>\n"
-            "```\n" + input_data.strip() + "\n```\n<<<END CONTENT>>>"
+            f"{input_data.strip()}\n"
+            "<<<END CONTENT>>>"
         )
 
-    # Reasoning strategy: expects config to include key 'reasoning_strategy' naming a strategy in app_config
+    # Reasoning strategy
     reasoning_strategy = config.get("reasoning_strategy")
     if reasoning_strategy and app_config:
         strategies = app_config.get("reasoning_strategies", {})

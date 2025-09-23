@@ -38,17 +38,17 @@ def retrieve_relevant_documents(
 
     relevant_results = {"ids": [], "documents": [], "distances": []}
 
-    logging.info("Embedding query...")
+    # logging.info("Embedding query...")
     query_embedding = embed_documents([query])[0]
 
-    logging.info("Querying collection...")
+    # logging.info("Querying collection...")
     results = collection.query(
         query_embeddings=[query_embedding],
         n_results=n_results,
         include=["documents", "distances"],
     )
 
-    logging.info("Filtering results...")
+    # logging.info("Filtering results...")
     for i, distance in enumerate(results["distances"][0]):
         if distance < threshold:
             relevant_results["ids"].append(results["ids"][0][i])
@@ -70,7 +70,10 @@ def respond_to_query(
     relevant_documents = retrieve_relevant_documents(query, n_results=n_results, threshold=threshold)
 
     # Build the input_data from retrieved documents (join with separators)
-    input_data = "\n\n---\n\n".join(relevant_documents)
+    input_data = {
+    "query": query,
+    "documents": relevant_documents
+}
 
     # Build system prompt (use advanced or basic as you like)
     # Example: use the advanced system prompt from your prompt YAML
@@ -126,10 +129,10 @@ if __name__ == "__main__":
             continue
 
         response = respond_to_query(
-            prompt_spec=prompt_config["rag_assistant_prompt"],  # 👈 fix here
+            prompt_spec=prompt_config["rag_assistant_prompt"], 
             query=query,
             llm=llm,
-            app_config=app_config,       # ✅ required, missing in your call
+            app_config=app_config,      
             **vectordb_params,
         )
 

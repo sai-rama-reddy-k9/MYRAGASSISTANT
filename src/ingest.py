@@ -10,8 +10,6 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from src.utils import load_publication
 from src.paths import PUBLICATION_FPATH
 
-
-
 device = (
     "cuda"
     if torch.cuda.is_available()
@@ -96,7 +94,7 @@ def main():
     collection = initialize_db(
         persist_directory=VECTOR_DB_DIR,
         collection_name="publications",
-        delete_existing=True, # Change to True to reset the DB
+        delete_existing=False, # Change to True to reset the DB
     )
     # if os.path.exists(PUBLICATIONS_JSON_FPATH):
     #     publications = load_publications_from_json(PUBLICATIONS_JSON_FPATH)

@@ -17,4 +17,3 @@ outputs/
 *.db
 *.sqlite3
 *.db
-*.log
